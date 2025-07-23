@@ -61,7 +61,11 @@ ROOT_URLCONF = 'djangoproj.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR,'frontend/static')], # path for the Django application to recognize the front-end static files.
+        'DIRS': [
+            os.path.join(BASE_DIR,'frontend/static'),
+            os.path.join(BASE_DIR, 'frontend/build'),
+            os.path.join(BASE_DIR, 'frontend/build/static'),
+            ], # path for the Django application to recognize the front-end files.
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -135,6 +139,8 @@ MEDIA_URL = '/media/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR,'frontend/static') # directory for the Django application to look for static files at the bottom of the file
-    ] 
+    os.path.join(BASE_DIR,'frontend/static'),
+    os.path.join(BASE_DIR, 'frontend/build'),
+    os.path.join(BASE_DIR, 'frontend/build/static'), 
+    ] # directory for the Django application to look for static files at the bottom of the file
 

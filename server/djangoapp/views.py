@@ -14,12 +14,11 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import CarMake, CarModel
 from .populate import initiate
 
+from .restapis import get_request, analyze_review_sentiments, post_review
+
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
-
-
-# Create your views here.
 
 # Create a `login_request` view to handle sign in request
 @csrf_exempt
@@ -96,19 +95,95 @@ def get_cars(request):
         cars.append({"CarModel": car_model.name, "CarMake": car_model.car_make.name})
     return JsonResponse({"CarModels":cars})
 
-# # Update the `get_dealerships` view to render the index page with
-# a list of dealerships
-# def get_dealerships(request):
-# ...
 
-# Create a `get_dealer_reviews` view to render the reviews of a dealer
-# def get_dealer_reviews(request,dealer_id):
-# ...
+def get_dealerships(request, state="All"):
+    """
+    Fetches dealership data based on the provided state, i.e.:
+    It will use the get_request implemented in the restapis.py passing the /fetchDealers endpoint.
 
-# Create a `get_dealer_details` view to render the dealer details
-# def get_dealer_details(request, dealer_id):
-# ...
+    If no state is provided, it fetches dealerships for 'All' states.
 
-# Create a `add_review` view to submit a review
-# def add_review(request):
-# ...
+    Args:
+        request: The HTTP request object.
+        state (str, optional): The state for which to fetch dealerships. Defaults to "All".
+
+    Returns:
+        Response: A JSON response containing the dealership data and a status code.
+    """
+    # Construct the endpoint URL based on the state
+    if(state == "All"):
+        endpoint = "/fetchDealers"
+    else:
+        endpoint = "/fetchDealers/"+state
+    # Make the request to fetch dealerships
+    dealerships = get_request(endpoint)
+    # Return the dealership data as a JSON response
+    return JsonResponse({"status":200,"dealers":dealerships})
+
+
+def get_dealer_reviews(request, dealer_id):
+    """
+    Fetches and returns details of a specific dealer.
+
+    Args:
+        request: HTTP request object.
+        dealer_id (int): ID of the dealer.
+
+    Returns:
+        JsonResponse: A JSON response containing dealer details.
+    """
+    # if dealer id has been provided
+    if(dealer_id):
+        endpoint = "/fetchReviews/dealer/"+str(dealer_id)
+        reviews = get_request(endpoint)
+        for review_detail in reviews:
+            response = analyze_review_sentiments(review_detail['review'])
+            print(response)
+            review_detail['sentiment'] = response['sentiment']
+        return JsonResponse({"status":200,"reviews":reviews})
+    else:
+        return JsonResponse({"status":400,"message":"Bad Request"})
+
+
+def get_dealer_details(request, dealer_id):
+    """
+    Function to fetch details of a dealer given their ID.
+
+    Parameters:
+    request (HttpRequest): The incoming HTTP request.
+    dealer_id (int): The unique identifier of the dealer.
+
+    Returns:
+    Response: A JSON response containing the dealer details or an error message.
+    """
+    if(dealer_id):
+        endpoint = "/fetchDealer/"+str(dealer_id)
+        dealership = get_request(endpoint)
+        return JsonResponse({"status":200,"dealer":dealership})
+    else:
+        return JsonResponse({"status":400,"message":"Bad Request"})
+
+def add_review(request):
+    """
+    Endpoint to add a review.
+
+    This function checks if the user is authenticated. If authenticated,
+    it extracts the review data from the request body, attempts to post the review,
+    and returns a JSON response with the status. If the user is not authenticated,
+    it returns an unauthorized status.
+
+    Args:
+        request: The HTTP request object.
+
+    Returns:
+        Response: A JSON response indicating success or failure.
+    """
+    if(request.user.is_anonymous == False):
+        data = json.loads(request.body)
+        try:
+            response = post_review(data)
+            return JsonResponse({"status":200})
+        except:
+            return JsonResponse({"status":401,"message":"Error in posting review"})
+    else:
+        return JsonResponse({"status":403,"message":"Unauthorized"})

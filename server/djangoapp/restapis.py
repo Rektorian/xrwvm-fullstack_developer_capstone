@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# These variables, i.e. backend_url & sentiment_analyzer_url are defined in .env file
 backend_url = os.getenv(
     'backend_url', default="http://localhost:3030")
 sentiment_analyzer_url = os.getenv(
@@ -55,9 +56,37 @@ def get_request(endpoint, **kwargs):
         # If any error occurs
         print("Network exception occurred")
 
-# def analyze_review_sentiments(text):
-# request_url = sentiment_analyzer_url+"analyze/"+text
-# Add code for retrieving sentiments
+def analyze_review_sentiments(text):
+    """Function to consume the microservice for sentiments analysis"""
+    request_url = sentiment_analyzer_url+"analyze/"+text # sentiment_analyzer_url is defined in .env file
+    try:
+        # Call get method of requests library with URL and parameters
+        response = requests.get(request_url)
+        return response.json()
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        print("Network exception occurred")
 
-# def post_review(data_dict):
-# Add code for posting review
+def post_review(data_dict):
+    """
+    Posts a review to the backend server.
+
+    This function sends a POST request to the specified backend URL with the review data.
+    It returns the JSON response from the server.
+
+    Parameters:
+    data_dict (dict): A dictionary containing the review data to be posted.
+
+    Returns:
+    dict: The JSON response from the server.
+
+    Raises:
+    Exception: If a network exception occurs during the request.
+    """
+    request_url = backend_url+"/insert_review"
+    try:
+        response = requests.post(request_url,json=data_dict)
+        print(response.json())
+        return response.json()
+    except:
+        print("Network exception occurred")

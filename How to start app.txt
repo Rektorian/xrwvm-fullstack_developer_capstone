@@ -1,0 +1,11 @@
+Navigate to: cd /home/project/xrwvm-fullstack_developer_capstone/server/database
+
+podman build . -t nodeapp
+podman-compose up
+
+Open djangoapp/.env and replace the your backend url with the URL of your backend you copied earlier in the notepad in the previous step from host 3030
+
+Navigate to: cd xrwvm-fullstack_developer_capstone/server/djangoapp/microservices
+
+podman build . -t senti_analyzer
+podman run --rm -it -p 5000:5000 senti_analyzer

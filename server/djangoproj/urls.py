@@ -26,7 +26,8 @@ urlpatterns = (
         path("register/", TemplateView.as_view(template_name="index.html")),
         path(
             "login/", TemplateView.as_view(template_name="index.html")
-        ),  # a route for the login view. Login view is a REACT page rendered from a route that is configured in /server/frontend/src/App.js.
+        ),  # a route for the login view. Login view is a REACT page rendered from 
+            # a route that is configured in /server/frontend/src/App.js.
         path("djangoapp/", include("djangoapp.urls")),
         path("", TemplateView.as_view(template_name="Home.html")),
         path("about/", TemplateView.as_view(template_name="About.html")),

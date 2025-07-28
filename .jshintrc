@@ -1,0 +1,11 @@
+{
+  "asi": true,
+  "esversion": 6,
+  "strict": false,
+  "undef": false,
+  "unused": false,
+  "globals": {
+    "module": true,
+    "require": true
+  }
+}

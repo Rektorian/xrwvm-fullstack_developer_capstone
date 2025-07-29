@@ -1,3 +1,5 @@
+I - Run locally
+
 1. Run the Mongo Server:
 
 Navigate to: cd /home/project/xrwvm-fullstack_developer_capstone/server/database
@@ -34,3 +36,29 @@ podman run --rm -it -p 5000:5000 senti_analyzer
 copy url to djangoapp/.env, e.g.:
 (It is essential to include the / at the end of the URL. Please ensure that it is copied.)
 sentiment_analyzer_url=http://localhost:5000/
+
+-------------------------------------------------------------------------
+
+II. How to run as image from K8s in podman:
+
+1. Create DockerFile & entrypoint.sh in server directory:
+
+2. Run to build image (it will take 10-20min):
+podman build . -t dealership --log-level=debug --progress=plain --format=docker
+
+3. K8s steps:
+Set deployment/yaml to:
+      containers:
+      - image: localhost/dealership:latest
+        imagePullPolicy: Never
+        name: dealership
+        ports:
+        - containerPort: 8000
+          hostPort: 8080 # add for port forwarding, e.g. here it will be accessible under port 8080
+          protocol: TCP
+
+4. run to deploy
+podman play kube deployment.yaml
+remove with:
+podman pod stop dealership-pod
+podman pod rm dealership-pod

@@ -6,11 +6,12 @@ podman build . -t nodeapp
 podman-compose up
 
 copy the URL from the address bar/container from host 3030, e.g.:
+(Make sure that the / at the end is not copied.)
 backend_url=http://localhost:3030
 
 Open djangoapp/.env and replace the your backend url with the URL from host 3030
 
-2. Environment setup (if not setup yet):
+2. Environment setup:
 cd /home/project/xrwvm-fullstack_developer_capstone/server
 
 pip install virtualenv
@@ -23,7 +24,7 @@ python3 manage.py makemigrations
 python3 manage.py migrate
 python3 manage.py runserver
 
-3. Deploy sentiment analysis on Code Engine as a microservice:
+3. Deploy sentiment analysis on local machine as a microservice:
 
 Navigate to: cd xrwvm-fullstack_developer_capstone/server/djangoapp/microservices
 
@@ -31,4 +32,5 @@ podman build . -t senti_analyzer
 podman run --rm -it -p 5000:5000 senti_analyzer
 
 copy url to djangoapp/.env, e.g.:
+(It is essential to include the / at the end of the URL. Please ensure that it is copied.)
 sentiment_analyzer_url=http://localhost:5000/
